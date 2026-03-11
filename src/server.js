@@ -4,6 +4,7 @@ require('dotenv').config();
 const express    = require('express');
 const helmet     = require('helmet');
 const cors       = require('cors');
+const fetch      = require('node-fetch');
 const authRoutes = require('./routes/auth');
 
 const app  = express();
