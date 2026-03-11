@@ -1,19 +1,16 @@
 // src/config/database.js
-const Database = require('better-sqlite3');
-const path     = require('path');
-const fs       = require('fs');
+const { Pool } = require('pg');
 require('dotenv').config();
 
-const dbPath = process.env.DB_PATH || './data/auth.db';
-const dir    = path.dirname(dbPath);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : false,
+});
 
-// Ensure the data directory exists
-if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+pool.on('error', (err) => {
+  console.error('PostgreSQL pool error:', err);
+});
 
-const db = new Database(dbPath);
-
-// Enable WAL mode for better concurrent read performance
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
-
-module.exports = db;
+module.exports = pool;
